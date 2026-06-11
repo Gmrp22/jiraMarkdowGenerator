@@ -23,7 +23,9 @@ const normalizeIssue = (issue) => {
 };
 
 const fetchAllTickets = async () => {
-  const url = `${env.JIRA_BASE_URL}/rest/api/3/search?maxResults=100`;
+  const jql = encodeURIComponent(`project = ${env.JIRA_PROJECT_KEY} ORDER BY created DESC`);
+  const fields = 'summary,description,status,issuetype,assignee';
+  const url = `${env.JIRA_BASE_URL}/rest/api/3/search/jql?jql=${jql}&maxResults=100&fields=${fields}`;
 
   logger.info('Fetching all tickets from Jira');
 
@@ -34,18 +36,24 @@ const fetchAllTickets = async () => {
     },
   });
 
+  if (!response.ok) {
+    const text = await response.text();
+    logger.error({ status: response.status, body: text }, 'Jira search request failed');
+    throw new AppError(`Jira API error: ${response.status}`, response.status);
+  }
+
   const data = await response.json();
-  const tickets = data.issues.map(normalizeIssue);
+  const tickets = (data.issues ?? []).map(normalizeIssue);
 
   logger.info({ count: tickets.length }, 'Tickets fetched from Jira');
 
   return tickets;
 };
 
-const fetchTicketById = async (id) => {
-  const url = `${env.JIRA_BASE_URL}/rest/api/3/issue/${id}`;
+const fetchTicketById = async (key) => {
+  const url = `${env.JIRA_BASE_URL}/rest/api/3/issue/${key}?fields=summary,description,status,issuetype,assignee`;
 
-  logger.info({ id }, 'Fetching ticket by id from Jira');
+  logger.info({ key }, 'Fetching ticket by key from Jira');
 
   const response = await fetch(url, {
     headers: {

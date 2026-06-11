@@ -34,14 +34,14 @@ describe('ticketStore.getAll', () => {
 });
 
 describe('ticketStore.getById', () => {
-  it('returns the ticket when found', () => {
-    const ticket = ticketStore.getById('1');
+  it('returns the ticket when found by key', async () => {
+    const ticket = await ticketStore.getById('PROJ-1');
     expect(ticket.key).toBe('PROJ-1');
   });
 
-  it('throws AppError 404 when not found', () => {
-    expect(() => ticketStore.getById('99')).toThrow(AppError);
-    expect(() => ticketStore.getById('99')).toThrow('Ticket not found');
+  it('throws AppError 404 when not found', async () => {
+    await expect(ticketStore.getById('PROJ-99')).rejects.toThrow(AppError);
+    await expect(ticketStore.getById('PROJ-99')).rejects.toThrow('Ticket not found');
   });
 });
 

@@ -8,6 +8,7 @@ const envSchema = z.object({
   JIRA_BASE_URL: z.string().min(1, 'JIRA_BASE_URL is required'),
   JIRA_API_TOKEN: z.string().min(1, 'JIRA_API_TOKEN is required'),
   JIRA_EMAIL: z.string().min(1, 'JIRA_EMAIL is required'),
+  JIRA_PROJECT_KEY: z.string().min(1, 'JIRA_PROJECT_KEY is required'),
   FRONTEND_URL: z.string().default('http://localhost:3000'),
   LOG_LEVEL: z.string().default('info'),
 });
