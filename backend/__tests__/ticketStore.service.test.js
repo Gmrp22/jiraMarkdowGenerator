@@ -1,0 +1,64 @@
+jest.mock('../services/jira.service');
+
+const jiraService = require('../services/jira.service');
+const ticketStore = require('../services/ticketStore.service');
+const AppError = require('../utils/AppError');
+
+const mockTickets = [
+  { id: '1', key: 'PROJ-1', summary: 'Fix bug', description: 'A bug', status: 'Open', type: 'Bug', assignee: null },
+  { id: '2', key: 'PROJ-2', summary: 'Add feature', description: 'New thing', status: 'Done', type: 'Story', assignee: 'Alice' },
+];
+
+beforeEach(async () => {
+  jiraService.fetchAllTickets.mockResolvedValue(mockTickets);
+  await ticketStore.refresh();
+});
+
+describe('ticketStore.refresh', () => {
+  it('loads tickets from jira into the store', async () => {
+    expect(ticketStore.getAll()).toHaveLength(2);
+  });
+
+  it('clears previous tickets on refresh', async () => {
+    jiraService.fetchAllTickets.mockResolvedValue([mockTickets[0]]);
+    await ticketStore.refresh();
+    expect(ticketStore.getAll()).toHaveLength(1);
+  });
+});
+
+describe('ticketStore.getAll', () => {
+  it('returns all tickets', () => {
+    const tickets = ticketStore.getAll();
+    expect(tickets).toHaveLength(2);
+  });
+});
+
+describe('ticketStore.getById', () => {
+  it('returns the ticket when found', () => {
+    const ticket = ticketStore.getById('1');
+    expect(ticket.key).toBe('PROJ-1');
+  });
+
+  it('throws AppError 404 when not found', () => {
+    expect(() => ticketStore.getById('99')).toThrow(AppError);
+    expect(() => ticketStore.getById('99')).toThrow('Ticket not found');
+  });
+});
+
+describe('ticketStore.search', () => {
+  it('filters by summary (case-insensitive)', () => {
+    const results = ticketStore.search('fix');
+    expect(results).toHaveLength(1);
+    expect(results[0].key).toBe('PROJ-1');
+  });
+
+  it('filters by description (case-insensitive)', () => {
+    const results = ticketStore.search('new thing');
+    expect(results).toHaveLength(1);
+    expect(results[0].key).toBe('PROJ-2');
+  });
+
+  it('returns empty array when no matches', () => {
+    expect(ticketStore.search('xyz123')).toHaveLength(0);
+  });
+});

@@ -24,6 +24,7 @@ app.get('/health', (req, res) => res.json({ status: 'ok' }));
 
 app.use('/auth', require('./routes/auth.routes'));
 app.use('/tickets', require('./routes/ticket.routes'));
+app.use('/context', require('./routes/context.routes'));
 
 app.use(errorHandler);
 
