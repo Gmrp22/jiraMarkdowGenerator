@@ -8,7 +8,9 @@ const generate = async (req, res, next) => {
     const tickets = await Promise.all(ticketIds.map((id) => ticketStore.getById(id)));
     const content = contextGenerator.generate(tickets);
     logger.info({ count: tickets.length }, 'Context generated');
-    return res.status(200).json({ content });
+    res.setHeader('Content-Type', 'text/markdown; charset=utf-8');
+    res.setHeader('Content-Disposition', 'attachment; filename="context.md"');
+    return res.status(200).send(content);
   } catch (err) {
     return next(err);
   }

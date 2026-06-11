@@ -1,1 +1,9 @@
-## [KAN-1] Check UI design\n**Tipo:** Epic\n**Status:** Tareas por hacer\n**Asignado:** Sin asignar\n\n### Descripción\nSin descripción.\n\n---
+## [KAN-1] Check UI design
+**Tipo:** Epic
+**Status:** Tareas por hacer
+**Asignado:** Sin asignar
+
+### Descripción
+Sin descripción.
+
+---

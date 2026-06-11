@@ -68,6 +68,7 @@ describe('jira.service', () => {
   describe('fetchAllTickets', () => {
     it('normaliza correctamente los tickets de la respuesta exitosa', async () => {
       fetchSpy.mockResolvedValue({
+        ok: true,
         json: jest.fn().mockResolvedValue({ issues: [mockIssue] }),
       });
 
@@ -76,7 +77,7 @@ describe('jira.service', () => {
       expect(tickets).toHaveLength(1);
       expect(tickets[0]).toEqual(expectedTicket);
       expect(fetchSpy).toHaveBeenCalledWith(
-        'https://test.atlassian.net/rest/api/3/search?maxResults=100',
+        expect.stringContaining('/rest/api/3/search/jql'),
         expect.objectContaining({
           headers: expect.objectContaining({
             Accept: 'application/json',
@@ -105,7 +106,7 @@ describe('jira.service', () => {
 
       expect(ticket).toEqual(expectedTicket);
       expect(fetchSpy).toHaveBeenCalledWith(
-        'https://test.atlassian.net/rest/api/3/issue/10001',
+        expect.stringContaining('/rest/api/3/issue/10001'),
         expect.objectContaining({
           headers: expect.objectContaining({
             Accept: 'application/json',

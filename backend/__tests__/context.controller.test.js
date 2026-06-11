@@ -9,7 +9,8 @@ const AppError = require('../utils/AppError');
 const makeRes = () => {
   const res = {};
   res.status = jest.fn().mockReturnValue(res);
-  res.json = jest.fn().mockReturnValue(res);
+  res.setHeader = jest.fn().mockReturnValue(res);
+  res.send = jest.fn().mockReturnValue(res);
   return res;
 };
 
@@ -30,7 +31,9 @@ describe('context.controller.generate', () => {
 
     expect(ticketStore.getById).toHaveBeenCalledWith('1');
     expect(res.status).toHaveBeenCalledWith(200);
-    expect(res.json).toHaveBeenCalledWith({ content: '## [PROJ-1] Fix bug\n---' });
+    expect(res.setHeader).toHaveBeenCalledWith('Content-Type', 'text/markdown; charset=utf-8');
+    expect(res.setHeader).toHaveBeenCalledWith('Content-Disposition', 'attachment; filename="context.md"');
+    expect(res.send).toHaveBeenCalledWith('## [PROJ-1] Fix bug\n---');
   });
 
   it('calls next with AppError 404 when a ticket is not found', async () => {

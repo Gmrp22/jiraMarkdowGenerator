@@ -16,19 +16,19 @@ beforeEach(async () => {
 
 describe('ticketStore.refresh', () => {
   it('loads tickets from jira into the store', async () => {
-    expect(ticketStore.getAll()).toHaveLength(2);
+    expect(await ticketStore.getAll()).toHaveLength(2);
   });
 
   it('clears previous tickets on refresh', async () => {
     jiraService.fetchAllTickets.mockResolvedValue([mockTickets[0]]);
     await ticketStore.refresh();
-    expect(ticketStore.getAll()).toHaveLength(1);
+    expect(await ticketStore.getAll()).toHaveLength(1);
   });
 });
 
 describe('ticketStore.getAll', () => {
-  it('returns all tickets', () => {
-    const tickets = ticketStore.getAll();
+  it('returns all tickets', async () => {
+    const tickets = await ticketStore.getAll();
     expect(tickets).toHaveLength(2);
   });
 });
@@ -46,19 +46,19 @@ describe('ticketStore.getById', () => {
 });
 
 describe('ticketStore.search', () => {
-  it('filters by summary (case-insensitive)', () => {
-    const results = ticketStore.search('fix');
+  it('filters by summary (case-insensitive)', async () => {
+    const results = await ticketStore.search('fix');
     expect(results).toHaveLength(1);
     expect(results[0].key).toBe('PROJ-1');
   });
 
-  it('filters by description (case-insensitive)', () => {
-    const results = ticketStore.search('new thing');
+  it('filters by description (case-insensitive)', async () => {
+    const results = await ticketStore.search('new thing');
     expect(results).toHaveLength(1);
     expect(results[0].key).toBe('PROJ-2');
   });
 
-  it('returns empty array when no matches', () => {
-    expect(ticketStore.search('xyz123')).toHaveLength(0);
+  it('returns empty array when no matches', async () => {
+    expect(await ticketStore.search('xyz123')).toHaveLength(0);
   });
 });
