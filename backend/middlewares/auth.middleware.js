@@ -3,13 +3,11 @@ const env = require('../config/env');
 const AppError = require('../utils/AppError');
 
 const authMiddleware = (req, res, next) => {
-  const authHeader = req.headers.authorization;
+  const token = req.cookies?.auth_token;
 
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return next(new AppError('Missing or invalid Authorization header', 401));
+  if (!token) {
+    return next(new AppError('Missing or invalid token', 401));
   }
-
-  const token = authHeader.split(' ')[1];
 
   try {
     const decoded = jwt.verify(token, env.JWT_SECRET);

@@ -19,16 +19,16 @@ const makeRes = () => {
 // ── authMiddleware ────────────────────────────────────────────────────────────
 
 describe('authMiddleware', () => {
-  it('calls next with 401 when Authorization header is missing', () => {
-    const req = { headers: {} };
+  it('calls next with 401 when cookie is missing', () => {
+    const req = { cookies: {} };
     const next = makeNext();
     authMiddleware(req, makeRes(), next);
     expect(next).toHaveBeenCalledWith(expect.any(AppError));
     expect(next.mock.calls[0][0].statusCode).toBe(401);
   });
 
-  it('calls next with 401 when header does not start with Bearer', () => {
-    const req = { headers: { authorization: 'Basic abc' } };
+  it('calls next with 401 when cookies object is absent', () => {
+    const req = {};
     const next = makeNext();
     authMiddleware(req, makeRes(), next);
     expect(next.mock.calls[0][0].statusCode).toBe(401);
@@ -36,7 +36,7 @@ describe('authMiddleware', () => {
 
   it('attaches decoded user and calls next when token is valid', () => {
     jwt.verify.mockReturnValue({ id: '1', email: 'a@b.com', role: 'user' });
-    const req = { headers: { authorization: 'Bearer valid-token' } };
+    const req = { cookies: { auth_token: 'valid-token' } };
     const next = makeNext();
     authMiddleware(req, makeRes(), next);
     expect(req.user).toEqual({ id: '1', email: 'a@b.com', role: 'user' });
@@ -45,7 +45,7 @@ describe('authMiddleware', () => {
 
   it('calls next with 401 when token verification throws', () => {
     jwt.verify.mockImplementation(() => { throw new Error('expired'); });
-    const req = { headers: { authorization: 'Bearer bad-token' } };
+    const req = { cookies: { auth_token: 'bad-token' } };
     const next = makeNext();
     authMiddleware(req, makeRes(), next);
     expect(next.mock.calls[0][0].statusCode).toBe(401);

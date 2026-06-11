@@ -46,7 +46,9 @@ const login = async (email, password) => {
 
   logger.info({ email }, 'User logged in');
 
-  return { token };
+  // eslint-disable-next-line no-unused-vars
+  const { passwordHash: _omit, ...safeUser } = user;
+  return { token, user: safeUser };
 };
 
 module.exports = { register, login };

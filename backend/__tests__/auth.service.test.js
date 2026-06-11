@@ -71,7 +71,9 @@ describe('auth.service', () => {
 
       const result = await authService.login('login@example.com', 'password123');
 
-      expect(result).toEqual({ token: 'signed-token' });
+      expect(result.token).toBe('signed-token');
+      expect(result.user).toHaveProperty('email', 'login@example.com');
+      expect(result.user).not.toHaveProperty('passwordHash');
     });
 
     it('lanza AppError 401 si el email no existe', async () => {

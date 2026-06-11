@@ -33,18 +33,19 @@ UI/src/
 │   └── tickets/                # TicketCard, TicketList, SearchBar, SelectedPanel
 ├── store/
 │   ├── ticketStore.ts          # Zustand: tickets seleccionados
-│   └── authStore.ts            # Zustand: token en memoria
+│   └── authStore.ts            # Zustand: token + cookie auth-token
 ├── services/
-│   ├── api.ts                  # instancia de axios con baseURL e interceptor de token
+│   ├── api.ts                  # apiFetch con baseURL, Authorization, responseType
 │   ├── auth.service.ts         # funciones fetch de auth (login, register)
 │   └── tickets.service.ts      # funciones fetch de tickets y context
 ├── hooks/
 │   ├── useAuth.ts              # wrapper sobre authStore
 │   ├── useTickets.ts           # React Query: getTickets, searchTickets
-│   └── useContext.ts           # React Query: generateContext (mutation)
+│   └── useGenerateContext.ts   # React Query: generateContext (mutation)
 ├── types/
-│   └── index.ts                # tipos TS: Ticket, User, AuthResponse
+│   └── index.ts                # tipos TS: Ticket, User, AuthResponse, AuthState, FetchOptions
 └── lib/
+    ├── env.ts                  # variables de entorno centralizadas (apiUrl, authCookieName)
     └── schemas.ts              # schemas Zod para formularios
 ```
 
@@ -73,30 +74,42 @@ const queryClient = new QueryClient({
 
 - [ ] Crear `UI/src/store/authStore.ts`:
   - Estado: `token: string | null`
-  - Acciones: `setToken(token)`, `clearToken()`
+  - Acciones:
+    - `setToken(token)` — guarda en Zustand **y** escribe cookie `auth-token` (para middleware)
+    - `clearToken()` — limpia Zustand **y** borra la cookie
+    - `initFromCookie()` — lee la cookie al cargar la app y sincroniza Zustand (sobrevive F5)
 
 - [ ] Crear `UI/src/services/api.ts` — función `apiFetch` wrapper sobre `fetch` nativo que:
   - Agrega `baseURL` desde `NEXT_PUBLIC_API_URL`
   - Lee el token de `authStore` y agrega `Authorization: Bearer <token>`
+  - Acepta `responseType: 'json' | 'text'` (default `'json'`) — necesario para `/context` que devuelve `text/markdown`
   - Llama `clearToken()` si recibe 401
   - Lanza error con mensaje si la respuesta no es ok
 
 ```ts
-export async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
+type FetchOptions = RequestInit & { responseType?: 'json' | 'text' };
+
+export async function apiFetch<T>(path: string, options?: FetchOptions): Promise<T> {
+  const { responseType = 'json', ...fetchOptions } = options ?? {};
   const token = useAuthStore.getState().token;
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${path}`, {
-    ...options,
+    ...fetchOptions,
     headers: {
       'Content-Type': 'application/json',
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...options?.headers,
+      ...fetchOptions?.headers,
     },
   });
   if (res.status === 401) useAuthStore.getState().clearToken();
   if (!res.ok) throw new Error(await res.text());
-  return res.json();
+  return responseType === 'text' ? (res.text() as Promise<T>) : res.json();
 }
 ```
+
+> **Por qué cookie + Zustand:**
+> - Zustand (memoria) → lo lee `apiFetch` en el browser
+> - Cookie `auth-token` → lo lee el middleware de Next.js en el servidor para proteger rutas
+> - `initFromCookie()` → sincroniza Zustand desde la cookie al hacer F5 o abrir nueva tab
 
 ## Paso 5 — Zustand (client state)
 
