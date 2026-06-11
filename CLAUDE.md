@@ -3,7 +3,7 @@ This project is an application that improves the process of generating context.m
 
 ## Stack & Architecture
 - REST Backend: Node.js (Express), CommonJS (no ESM), JWT Auth, Pino, cors, helmet, bcrypt, express-rate-limit, Zod.
-- Frontend: Next.js, Zustand + RTK Query, TypeScript
+- Frontend: Next.js 16, Zustand + TanStack React Query, TypeScript
 - Style: Tailwind CSS + Headless UI
 - Validation: Zod — schemas live in the route file, applied via `validate(schema)` middleware before the controller. Controllers trust `req.body` is already validated.
 - Testing: Jest, Prettier, ESLint
@@ -11,9 +11,9 @@ This project is an application that improves the process of generating context.m
 ## Frontend Standards
 - Common style for all components.
 - Use server components when needed; avoid client components for sensitive data.
-- Use RTK Query for data fetching, loading, caching, throttling (server state).
+- Use TanStack React Query for data fetching, loading, caching, throttling (server state).
 - Zustand for client state only (UI state, selections, etc.).
-- RTK Query manages server state; Zustand manages client state.
+- TanStack React Query manages server state; Zustand manages client state.
 - Validate input using Zod.
 - Standard folder structure.
 
@@ -46,11 +46,13 @@ This project is an application that improves the process of generating context.m
 | Method | Route | Auth | Description | Status |
 |--------|-------|------|-------------|--------|
 | POST | `/auth/register` | No | Register new user | 201 |
-| POST | `/auth/login` | No | Login, returns JWT | 200 |
-| GET | `/tickets` | Yes | All tickets from store | 200 |
-| GET | `/tickets/:key` | Yes | Single ticket by key (e.g. KAN-1) | 200 |
-| GET | `/tickets/search?q=` | Yes | Search by keyword | 200 |
-| POST | `/context` | Yes | Receives `{ ticketIds: string[] }`, returns `.md` file | 200 |
+| POST | `/auth/login` | No | Login, sets HttpOnly cookie `auth_token`, returns `{ user }` | 200 |
+| POST | `/auth/logout` | No | Clears `auth_token` cookie | 200 |
+| GET | `/auth/me` | Yes (cookie) | Returns current user from cookie session | 200 |
+| GET | `/tickets` | Yes (cookie) | All tickets from store | 200 |
+| GET | `/tickets/:key` | Yes (cookie) | Single ticket by key (e.g. KAN-1) | 200 |
+| GET | `/tickets/search?q=` | Yes (cookie) | Search by keyword | 200 |
+| POST | `/context` | Yes (cookie) | Receives `{ ticketIds: string[] }`, returns `.md` file | 200 |
 | GET | `/health` | No | Health check | 200 |
 
 ## Secrets Management
@@ -60,6 +62,14 @@ Store in `.env` — never commit:
 - `JIRA_BASE_URL` — e.g. `https://your-domain.atlassian.net`
 - `JIRA_PROJECT_KEY` — e.g. `KAN`
 - `JWT_SECRET`
+
+## Auth Flow
+- Login → server sets `HttpOnly` cookie `auth_token` (JS cannot read it) + returns `{ user }`
+- Every request → browser sends cookie automatically (no manual Authorization header)
+- Auth middleware reads `req.cookies.auth_token` to verify JWT
+- Frontend Zustand stores `{ user, isAuthenticated }` — never the token
+- On app load, `initFromServer()` calls `GET /auth/me` with `credentials: 'include'` to hydrate Zustand
+- CORS configured with `credentials: true` + specific `FRONTEND_URL`
 
 ## Testing Protocol
 - Unit tests per file in `__tests__/`.

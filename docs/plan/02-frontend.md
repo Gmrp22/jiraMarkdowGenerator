@@ -70,46 +70,28 @@ const queryClient = new QueryClient({
 });
 ```
 
-## Paso 4 — fetch helper + Zustand auth
+## Paso 4 — fetch helper + Zustand auth ✅
 
-- [ ] Crear `UI/src/store/authStore.ts`:
-  - Estado: `token: string | null`
-  - Acciones:
-    - `setToken(token)` — guarda en Zustand **y** escribe cookie `auth-token` (para middleware)
-    - `clearToken()` — limpia Zustand **y** borra la cookie
-    - `initFromCookie()` — lee la cookie al cargar la app y sincroniza Zustand (sobrevive F5)
+- [x] `UI/src/store/authStore.ts`:
+  - Estado: `user: User | null`, `isAuthenticated: boolean`
+  - `setUser(user)` — guarda usuario en Zustand tras login
+  - `clearUser()` — limpia estado en logout
+  - `initFromServer()` — async, llama `GET /auth/me` con `credentials: 'include'` para hidratar el store al cargar la app (sobrevive F5)
 
-- [ ] Crear `UI/src/services/api.ts` — función `apiFetch` wrapper sobre `fetch` nativo que:
-  - Agrega `baseURL` desde `NEXT_PUBLIC_API_URL`
-  - Lee el token de `authStore` y agrega `Authorization: Bearer <token>`
-  - Acepta `responseType: 'json' | 'text'` (default `'json'`) — necesario para `/context` que devuelve `text/markdown`
-  - Llama `clearToken()` si recibe 401
-  - Lanza error con mensaje si la respuesta no es ok
+- [x] `UI/src/services/api.ts` — función `apiFetch` wrapper sobre `fetch` nativo:
+  - Agrega `baseURL` desde `env.apiUrl`
+  - Usa `credentials: 'include'` — el browser envía la cookie HttpOnly automáticamente
+  - Sin Authorization header manual — el token viaja solo en la cookie
+  - Acepta `responseType: 'json' | 'text'` — necesario para `/context` que devuelve `text/markdown`
+  - Lanza error con mensaje del backend si la respuesta no es ok
 
-```ts
-type FetchOptions = RequestInit & { responseType?: 'json' | 'text' };
+- [x] `UI/src/middleware.ts` — protege rutas leyendo cookie `auth_token` server-side (Next.js puede leer HttpOnly cookies en middleware)
 
-export async function apiFetch<T>(path: string, options?: FetchOptions): Promise<T> {
-  const { responseType = 'json', ...fetchOptions } = options ?? {};
-  const token = useAuthStore.getState().token;
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${path}`, {
-    ...fetchOptions,
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...fetchOptions?.headers,
-    },
-  });
-  if (res.status === 401) useAuthStore.getState().clearToken();
-  if (!res.ok) throw new Error(await res.text());
-  return responseType === 'text' ? (res.text() as Promise<T>) : res.json();
-}
-```
-
-> **Por qué cookie + Zustand:**
-> - Zustand (memoria) → lo lee `apiFetch` en el browser
-> - Cookie `auth-token` → lo lee el middleware de Next.js en el servidor para proteger rutas
-> - `initFromCookie()` → sincroniza Zustand desde la cookie al hacer F5 o abrir nueva tab
+> **Por qué HttpOnly cookie:**
+> - JS nunca puede leer el token → inmune a XSS
+> - El browser la envía automáticamente en cada request → sin Authorization header manual
+> - Next.js middleware puede leerla server-side → protección de rutas funciona correctamente
+> - Zustand guarda el **usuario**, no el token
 
 ## Paso 5 — Zustand (client state)
 
@@ -168,7 +150,13 @@ export const useGenerateContext = () =>
 
 - [ ] Crear `UI/src/app/(auth)/login/page.tsx` — página server, redirige si ya hay token
 - [ ] Crear `UI/src/components/auth/LoginForm.tsx` — `'use client'`, valida con `loginSchema` de Zod, llama `login` de `auth.service.ts`, guarda token en Zustand `authStore`
-- [ ] Crear middleware de Next.js `UI/src/middleware.ts` — protege rutas `/dashboard/*`, redirige a `/login` si no hay token
+- [x] `UI/src/middleware.ts` — verifica el JWT con `jose` antes de dar acceso a rutas protegidas:
+  - Lee la cookie `auth_token` del request (server-side, puede leer HttpOnly)
+  - Verifica la **firma y expiración** del JWT usando `JWT_SECRET` — no solo comprueba que la cookie exista
+  - Sin token válido + ruta protegida → redirect a `/login`
+  - Con token válido + ruta de auth → redirect a `/tickets` (ya está logueado)
+  - Requiere `JWT_SECRET` en `UI/.env.local` (sin `NEXT_PUBLIC_` — server-only)
+  - Usa `jose` en vez de `jsonwebtoken` porque el middleware corre en **Edge Runtime** (no tiene Node.js crypto)
 
 ## Paso 10 — Página de tickets
 
