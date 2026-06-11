@@ -8,6 +8,10 @@ This project is an application that improves the process of generating context.m
 - Validation: Zod — schemas live in the route file, applied via `validate(schema)` middleware before the controller. Controllers trust `req.body` is already validated.
 - Testing: Jest, Prettier, ESLint
 
+## Frontend Type Standards
+- **All TypeScript interfaces and types go in `src/types/index.ts`** — never inline them in components, stores, or services.
+- Import types with `import type { ... } from '@/types'`.
+
 ## Frontend Standards
 - Common style for all components.
 - Use server components when needed; avoid client components for sensitive data.

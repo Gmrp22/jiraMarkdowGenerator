@@ -31,3 +31,10 @@ export interface AuthState {
 }
 
 export type FetchOptions = RequestInit & { responseType?: 'json' | 'text' };
+
+export interface TicketStoreState {
+  selectedTickets: Ticket[];
+  selectTicket: (ticket: Ticket) => void;
+  removeTicket: (key: string) => void;
+  clearSelection: () => void;
+}
