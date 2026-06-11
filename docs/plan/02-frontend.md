@@ -95,23 +95,24 @@ const queryClient = new QueryClient({
 
 ## Paso 5 — Zustand (client state)
 
-- [ ] Crear `UI/src/store/ticketStore.ts`:
+- [x] Crear `UI/src/store/ticketStore.ts`:
   - Estado: `selectedTickets: Ticket[]`
   - Acciones: `selectTicket(ticket)`, `removeTicket(id)`, `clearSelection()`
   - Regla: no duplicados al seleccionar
 
-## Paso 6 — Funciones de fetch y hooks React Query
+## Paso 6 — Servicios y hooks React Query ✅
 
-- [ ] Crear `UI/src/services/auth.service.ts`:
-  - `login(email, password)` — usa `apiFetch` para POST `/auth/login`, retorna `AuthResponse`
-  - `register(email, password)` — usa `apiFetch` para POST `/auth/register`
+- [x] `UI/src/services/auth.service.ts`:
+  - `login(email, password)` — POST `/auth/login`, retorna `{ user: User }` (el servidor setea la cookie)
+  - `register(email, password)` — POST `/auth/register`, retorna `{ user: User }`
+  - `logout()` — POST `/auth/logout` (el servidor borra la cookie)
 
-- [ ] Crear `UI/src/services/tickets.service.ts`:
-  - `getTickets()` — usa `apiFetch` para GET `/tickets`
-  - `searchTickets(query)` — usa `apiFetch` para GET `/tickets/search?q=query`
-  - `generateContext(ticketIds)` — usa `apiFetch` para POST `/context`, retorna el string `.md`
+- [x] `UI/src/services/tickets.service.ts`:
+  - `getTickets()` — GET `/tickets`, retorna `Ticket[]`
+  - `searchTickets(query)` — GET `/tickets/search?q=query`, retorna `Ticket[]`
+  - `generateContext(ticketIds)` — POST `/context` con `responseType: 'text'`, retorna el string `.md`
 
-- [ ] Crear `UI/src/hooks/useTickets.ts`:
+- [x] `UI/src/hooks/useTickets.ts`:
 ```ts
 export const useTickets = (query?: string) =>
   useQuery({
@@ -120,7 +121,7 @@ export const useTickets = (query?: string) =>
   });
 ```
 
-- [ ] Crear `UI/src/hooks/useGenerateContext.ts`:
+- [x] `UI/src/hooks/useGenerateContext.ts`:
 ```ts
 export const useGenerateContext = () =>
   useMutation({
@@ -128,15 +129,18 @@ export const useGenerateContext = () =>
   });
 ```
 
-- [ ] Crear `UI/src/hooks/useAuth.ts` — wrapper sobre `authStore` que expone `isAuthenticated`, `logout()`
+- [x] `UI/src/hooks/useAuth.ts`:
+  - Lee `user` e `isAuthenticated` de `authStore` con selectores Zustand
+  - `logout()` — llama `auth.service.logout()` + `clearUser()` en Zustand
 
-## Paso 7 — Schemas Zod y tipos
+## Paso 7 — Schemas Zod ✅
 
-- [ ] Crear `UI/src/types/index.ts` — exportar tipos: `Ticket`, `User`, `AuthResponse`, `ContextRequest`
-- [ ] Crear `UI/src/lib/schemas.ts` — schemas Zod para formularios:
+- [x] `UI/src/types/index.ts` — `User`, `Ticket`, `AuthResponse`, `ContextRequest`, `AuthState`, `TicketStoreState`, `FetchOptions`
+- [x] `UI/src/lib/schemas.ts` — schemas Zod para formularios:
   - `loginSchema` → `{ email, password }`
-  - `registerSchema` → `{ email, password, confirmPassword }`
+  - `registerSchema` → `{ email, password, confirmPassword }` + refinement que valida que las contraseñas coincidan
   - `searchSchema` → `{ query: string }`
+  - Exporta también los tipos inferidos: `LoginFormData`, `RegisterFormData`, `SearchFormData`
 
 ## Paso 8 — Componentes UI base
 
@@ -149,7 +153,7 @@ export const useGenerateContext = () =>
 ## Paso 9 — Autenticación
 
 - [ ] Crear `UI/src/app/(auth)/login/page.tsx` — página server, redirige si ya hay token
-- [ ] Crear `UI/src/components/auth/LoginForm.tsx` — `'use client'`, valida con `loginSchema` de Zod, llama `login` de `auth.service.ts`, guarda token en Zustand `authStore`
+- [ ] Crear `UI/src/components/auth/LoginForm.tsx` — `'use client'`, valida con `loginSchema` de Zod, llama `login` de `auth.service.ts`, llama `setUser(user)` en `authStore`
 - [x] `UI/src/middleware.ts` — verifica el JWT con `jose` antes de dar acceso a rutas protegidas:
   - Lee la cookie `auth_token` del request (server-side, puede leer HttpOnly)
   - Verifica la **firma y expiración** del JWT usando `JWT_SECRET` — no solo comprueba que la cookie exista
