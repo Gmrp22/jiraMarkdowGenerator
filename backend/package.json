@@ -15,7 +15,10 @@
   "author": "",
   "license": "ISC",
   "lint-staged": {
-    "*.{js,ts}": ["eslint --fix", "prettier --write"]
+    "*.{js,ts}": [
+      "eslint --fix",
+      "prettier --write"
+    ]
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
@@ -30,9 +33,11 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "eslint": "^10.4.1",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-node": "^11.1.0",
+    "globals": "^17.6.0",
     "jest": "^30.4.2",
     "nodemon": "^3.1.14",
     "prettier": "^3.8.4"

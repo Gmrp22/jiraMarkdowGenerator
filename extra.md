@@ -1,3 +1,5 @@
 00-setup.md — estructura de carpetas, instalación de librerías, configuración de Prettier/ESLint, hooks de Git con Husky
 01-backend.md — pasos numerados con checklist. Incluir al inicio una tabla con todas las rutas REST (método, ruta, si requiere auth, descripción, status de respuesta). Cada paso debe especificar: qué archivo crear, qué hace cada función con sus pasos internos, y el formato exacto de request/response
 02-frontend.md — pasos numerados con checklist. Separar claramente qué maneja React Query (server state) y qué maneja Zustand (client state). Incluir snippets de código clave para el setup
+
+tmux new -s mi-proyecto-next

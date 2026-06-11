@@ -5,7 +5,20 @@
       "Bash(npm install *)",
       "Read(//private/tmp/**)",
       "Bash(npx create-next-app@latest ticket-generator-ui --typescript --tailwind --eslint --app --src-dir --import-alias \"@/*\" --no-git --yes)",
-      "Bash(git init *)"
-    ]
+      "Bash(git init *)",
+      "Bash(npm run *)",
+      "Bash(node -e \"const eslint = require\\('/Users/gildarivera/Dev/Projects/ticketGenerator/backend/node_modules/eslint'\\); console.log\\(Object.keys\\(eslint\\)\\)\")",
+      "Bash(timeout 4 node server.js)",
+      "Bash(curl -s http://localhost:3001/health)",
+      "Bash(kill %1)",
+      "Bash(wait)",
+      "Bash(npm test *)",
+      "Bash(npx jest *)"
+    ],
+    "teammateMode": "tmux",
+    "env": {
+      "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
+      "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS_SPLIT_PANEL": "true"
+    }
   }
 }
