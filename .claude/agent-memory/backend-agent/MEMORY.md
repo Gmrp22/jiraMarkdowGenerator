@@ -1,2 +1,3 @@
 - [Auth Step Completado](project-auth-step.md) — Paso 4 auth implementado y testeado: modelos, service, controller, routes, tests unitarios
 - [Jira Step Completado](project-jira-step.md) — Paso 5 Jira API + store en memoria: ticket.model, jira.service, ticketStore.service, 4 tests pasando
+- [Context Step Completado](project-context-step.md) — Paso 7 generación context.md: contextGenerator.service, context.controller, context.routes, /context en app.js, 4 tests pasando
