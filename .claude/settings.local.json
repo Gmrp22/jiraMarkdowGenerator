@@ -13,7 +13,8 @@
       "Bash(kill %1)",
       "Bash(wait)",
       "Bash(npm test *)",
-      "Bash(npx jest *)"
+      "Bash(npx jest *)",
+      "Bash(node node_modules/eslint/bin/eslint.js .)"
     ],
     "teammateMode": "tmux",
     "env": {
