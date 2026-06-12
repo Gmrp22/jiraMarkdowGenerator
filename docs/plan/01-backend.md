@@ -87,9 +87,12 @@ Usuarios en Map en memoria (sin base de datos). Auth via HttpOnly cookie.
   - `fetchAllTickets()` — llama `/rest/api/3/search/jql?jql=project=KAN...&fields=...`
   - `fetchTicketById(key)` — llama `/rest/api/3/issue/{key}?fields=...`
   - Auth Basic: `base64(email:token)`
+  - `extractAdfText(node)` — recorre recursivamente el Atlassian Document Format (ADF) y extrae texto plano. Maneja párrafos, texto en negrita/cursiva, listas numeradas, listas con viñetas y saltos de línea. Imágenes (`mediaSingle`, `media`) se ignoran.
+  > ⚠️ La descripción de Jira API v3 viene en formato ADF (JSON anidado), no texto plano. Extraer solo el primer nodo resulta en descripciones incompletas.
 - [x] `backend/services/ticketStore.service.js` — Map en memoria:
   - Indexado por `ticket.key` (no por `ticket.id` numérico)
-  - **Lazy loading**: `ensureLoaded()` llama `refresh()` solo si el store está vacío
+  - **Lazy loading**: `ensureLoaded()` llama `refresh()` solo si el store está vacío o expirado
+  - **TTL de 5 minutos**: `lastLoadedAt` timestamp — si pasaron más de 5 min desde el último refresh, recarga desde Jira automáticamente. Tickets nuevos aparecen sin reiniciar el servidor.
   - `getAll()`, `getById(key)`, `search(query)` son async
   - No se llama `refresh()` al arrancar el servidor
 - [x] `backend/__tests__/jira.service.test.js` — 4 tests (fetch mockeado)

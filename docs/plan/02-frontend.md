@@ -174,15 +174,18 @@ export const useGenerateContext = () =>
 - [x] `UI/src/components/tickets/SearchBar.tsx` — debounce 400ms con `useEffect` + `clearTimeout`
 - [x] `UI/src/components/tickets/TicketCard.tsx` — muestra `key`, `summary`, `status`, `type`; botón Seleccionar/Quitar con Zustand
 - [x] `UI/src/components/tickets/TicketList.tsx` — estados `isLoading` (Spinner), `isError`, vacío
-- [x] `UI/src/components/tickets/SelectedPanel.tsx` — lista de seleccionados, botón generar con count
+- [x] `UI/src/components/tickets/SelectedPanel.tsx` — dos estados: lista de seleccionados / preview del markdown generado
 
-## Paso 11 — Generación y descarga del context.md ✅
+## Paso 11 — Generación del context.md ✅
 
-- [x] En `tickets/page.tsx`, `handleGenerate` llama `useGenerateContext` mutation con los IDs seleccionados
-- [x] `SelectedPanel` muestra `loading` (Spinner en Button) mientras `isPending`
-- [x] Al recibir respuesta, crea `Blob` → `URL.createObjectURL` → `<a download>` temporal → `revokeObjectURL`
+- [x] `useEffect` en `tickets/page.tsx` observa `selectedTickets` — genera automáticamente al seleccionar/quitar un ticket sin botón extra
+  - `generate` (mutate de React Query) se excluye del array de deps con `eslint-disable` porque React Query garantiza que es estable entre renders
+  - `displayMarkdown` es un valor derivado: `undefined` si no hay tickets seleccionados, evita mostrar markdown stale
+- [x] `SelectedPanel` muestra Spinner mientras `isPending`, luego el markdown en `<pre>` con scroll
+- [x] Botón "Copiar markdown" usa `navigator.clipboard.writeText` — feedback visual "¡Copiado!" por 2 segundos
+- [x] Botón "Limpiar selección" limpia Zustand + resetea markdown
 - [x] Error se muestra con `Modal` si la mutation falla
-- [x] `clearSelection()` después de descarga exitosa
+- [x] El markdown se muestra en el panel lateral — no se descarga como archivo
 
 ## Paso 12 — Tests y calidad
 
