@@ -85,3 +85,6 @@ Store in `.env` — never commit:
 - Run after generating a new file:
   - `npm run lint`
   - `npm run prettier:fix`
+
+## IMPORTANT
+- DO NOT read the @.env file

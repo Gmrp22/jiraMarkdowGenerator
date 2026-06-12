@@ -150,10 +150,10 @@ export const useGenerateContext = () =>
 - [x] `UI/src/components/ui/Spinner.tsx` — tamaños sm, md, lg
 - [x] `UI/src/components/ui/Modal.tsx` — usando Headless UI `Dialog`
 
-## Paso 9 — Autenticación
+## Paso 9 — Autenticación ✅
 
-- [ ] Crear `UI/src/app/(auth)/login/page.tsx` — página server, redirige si ya hay token
-- [ ] Crear `UI/src/components/auth/LoginForm.tsx` — `'use client'`, valida con `loginSchema` de Zod, llama `login` de `auth.service.ts`, llama `setUser(user)` en `authStore`
+- [x] `UI/src/app/(auth)/login/page.tsx` — server component, centra el formulario en pantalla
+- [x] `UI/src/components/auth/LoginForm.tsx` — `'use client'`, valida con `loginSchema` (Zod `safeParse`), llama `login` de `auth.service.ts`, llama `setUser(user)` en `authStore`, redirige a `/tickets`
 - [x] `UI/src/middleware.ts` — verifica el JWT con `jose` antes de dar acceso a rutas protegidas:
   - Lee la cookie `auth_token` del request (server-side, puede leer HttpOnly)
   - Verifica la **firma y expiración** del JWT usando `JWT_SECRET` — no solo comprueba que la cookie exista

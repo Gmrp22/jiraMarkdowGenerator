@@ -67,3 +67,7 @@ export interface ModalProps {
   title: string;
   children: React.ReactNode;
 }
+
+export interface LoginFormProps {
+  onSuccess?: () => void;
+}
