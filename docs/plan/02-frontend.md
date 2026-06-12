@@ -133,9 +133,15 @@ export const useGenerateContext = () =>
   - Lee `user` e `isAuthenticated` de `authStore` con selectores Zustand
   - `logout()` — llama `auth.service.logout()` + `clearUser()` en Zustand
 
-## Paso 7 — Schemas Zod ✅
+## Paso 7 — Schemas Zod + Utilidades ✅
 
 - [x] `UI/src/types/index.ts` — `User`, `Ticket`, `AuthResponse`, `ContextRequest`, `AuthState`, `TicketStoreState`, `FetchOptions`
+- [x] `UI/src/lib/schemas.ts` — schemas Zod para formularios:
+- [x] `UI/src/lib/formatError.ts` — helper para formatear errores de API:
+  - Recibe `unknown` (el `err` del catch)
+  - Intenta parsear `err.message` como JSON y extrae el campo `message`
+  - Si no es JSON, retorna el texto raw
+  - Usado en `LoginForm` y `tickets/page.tsx` para mostrar mensajes legibles al usuario en vez del JSON crudo del backend
 - [x] `UI/src/lib/schemas.ts` — schemas Zod para formularios:
   - `loginSchema` → `{ email, password }`
   - `registerSchema` → `{ email, password, confirmPassword }` + refinement que valida que las contraseñas coincidan
@@ -162,21 +168,21 @@ export const useGenerateContext = () =>
   - Requiere `JWT_SECRET` en `UI/.env.local` (sin `NEXT_PUBLIC_` — server-only)
   - Usa `jose` en vez de `jsonwebtoken` porque el middleware corre en **Edge Runtime** (no tiene Node.js crypto)
 
-## Paso 10 — Página de tickets
+## Paso 10 — Página de tickets ✅
 
-- [ ] Crear `UI/src/app/(dashboard)/tickets/page.tsx` — server component, layout con SearchBar + TicketList + SelectedPanel
-- [ ] Crear `UI/src/components/tickets/SearchBar.tsx` — `'use client'`, input con debounce que actualiza el `query` pasado al hook `useTickets`
-- [ ] Crear `UI/src/components/tickets/TicketCard.tsx` — muestra `key`, `summary`, `status`, `type`; botón para seleccionar/deseleccionar usando Zustand
-- [ ] Crear `UI/src/components/tickets/TicketList.tsx` — usa `useTickets(query)`, maneja estados `isLoading` / `isError` de React Query
-- [ ] Crear `UI/src/components/tickets/SelectedPanel.tsx` — `'use client'`, lee `selectedTickets` de Zustand, botón "Generar Context.md"
+- [x] `UI/src/app/(dashboard)/tickets/page.tsx` — client component, grid 2/3+1/3, header con logout, modal de error
+- [x] `UI/src/components/tickets/SearchBar.tsx` — debounce 400ms con `useEffect` + `clearTimeout`
+- [x] `UI/src/components/tickets/TicketCard.tsx` — muestra `key`, `summary`, `status`, `type`; botón Seleccionar/Quitar con Zustand
+- [x] `UI/src/components/tickets/TicketList.tsx` — estados `isLoading` (Spinner), `isError`, vacío
+- [x] `UI/src/components/tickets/SelectedPanel.tsx` — lista de seleccionados, botón generar con count
 
-## Paso 11 — Generación y descarga del context.md
+## Paso 11 — Generación y descarga del context.md ✅
 
-- [ ] En `SelectedPanel.tsx`, al hacer click en "Generar", llamar `useGenerateContext` mutation con los IDs seleccionados
-- [ ] Mostrar `Spinner` mientras `isPending` es true (estado de React Query)
-- [ ] Al recibir respuesta, crear un `Blob` con el contenido `.md` y disparar descarga con un `<a download>` temporal
-- [ ] Mostrar error con `Modal.tsx` si la mutation falla (`isError`)
-- [ ] Limpiar selección con `clearSelection()` de Zustand después de descarga exitosa
+- [x] En `tickets/page.tsx`, `handleGenerate` llama `useGenerateContext` mutation con los IDs seleccionados
+- [x] `SelectedPanel` muestra `loading` (Spinner en Button) mientras `isPending`
+- [x] Al recibir respuesta, crea `Blob` → `URL.createObjectURL` → `<a download>` temporal → `revokeObjectURL`
+- [x] Error se muestra con `Modal` si la mutation falla
+- [x] `clearSelection()` después de descarga exitosa
 
 ## Paso 12 — Tests y calidad
 
@@ -198,3 +204,4 @@ export const useGenerateContext = () =>
 | Datos del servidor | React Query | Lista de tickets, respuesta del login |
 | Estado del browser | Zustand | Tickets seleccionados, token JWT |
 | Estado de formularios | Zod + useState local | Validación de login form |
+

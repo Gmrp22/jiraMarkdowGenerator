@@ -15,7 +15,15 @@ const makeRes = () => {
 };
 
 const mockTickets = [
-  { id: '1', key: 'PROJ-1', summary: 'Fix bug', description: 'desc', status: 'Open', type: 'Bug', assignee: null },
+  {
+    id: '1',
+    key: 'PROJ-1',
+    summary: 'Fix bug',
+    description: 'desc',
+    status: 'Open',
+    type: 'Bug',
+    assignee: null,
+  },
 ];
 
 describe('context.controller.generate', () => {
@@ -32,12 +40,17 @@ describe('context.controller.generate', () => {
     expect(ticketStore.getById).toHaveBeenCalledWith('1');
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.setHeader).toHaveBeenCalledWith('Content-Type', 'text/markdown; charset=utf-8');
-    expect(res.setHeader).toHaveBeenCalledWith('Content-Disposition', 'attachment; filename="context.md"');
+    expect(res.setHeader).toHaveBeenCalledWith(
+      'Content-Disposition',
+      'attachment; filename="context.md"'
+    );
     expect(res.send).toHaveBeenCalledWith('## [PROJ-1] Fix bug\n---');
   });
 
   it('calls next with AppError 404 when a ticket is not found', async () => {
-    ticketStore.getById.mockImplementation(() => { throw new AppError('Ticket not found', 404); });
+    ticketStore.getById.mockImplementation(() => {
+      throw new AppError('Ticket not found', 404);
+    });
 
     const req = { body: { ticketIds: ['99'] } };
     const next = jest.fn();
@@ -49,7 +62,9 @@ describe('context.controller.generate', () => {
   });
 
   it('calls next with error when an unexpected error occurs', async () => {
-    ticketStore.getById.mockImplementation(() => { throw new Error('unexpected'); });
+    ticketStore.getById.mockImplementation(() => {
+      throw new Error('unexpected');
+    });
 
     const req = { body: { ticketIds: ['1'] } };
     const next = jest.fn();

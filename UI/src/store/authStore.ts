@@ -10,6 +10,8 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   clearUser: () => set({ user: null, isAuthenticated: false }),
 
+  // La cookie HttpOnly es invisible para JS. Este método le pregunta al servidor quién
+  // es el usuario para hidratar Zustand — necesario en cada carga de página (ej. F5).
   initFromServer: async () => {
     try {
       const res = await fetch(`${env.apiUrl}/auth/me`, {

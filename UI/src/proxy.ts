@@ -3,7 +3,7 @@ import { jwtVerify } from 'jose';
 
 const secret = new TextEncoder().encode(process.env.JWT_SECRET);
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const token = request.cookies.get('auth_token')?.value;
   const isAuthRoute = request.nextUrl.pathname.startsWith('/login');
   const isDashboardRoute =

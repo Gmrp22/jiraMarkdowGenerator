@@ -5,8 +5,24 @@ const ticketStore = require('../services/ticketStore.service');
 const AppError = require('../utils/AppError');
 
 const mockTickets = [
-  { id: '1', key: 'PROJ-1', summary: 'Fix bug', description: 'A bug', status: 'Open', type: 'Bug', assignee: null },
-  { id: '2', key: 'PROJ-2', summary: 'Add feature', description: 'New thing', status: 'Done', type: 'Story', assignee: 'Alice' },
+  {
+    id: '1',
+    key: 'PROJ-1',
+    summary: 'Fix bug',
+    description: 'A bug',
+    status: 'Open',
+    type: 'Bug',
+    assignee: null,
+  },
+  {
+    id: '2',
+    key: 'PROJ-2',
+    summary: 'Add feature',
+    description: 'New thing',
+    status: 'Done',
+    type: 'Story',
+    assignee: 'Alice',
+  },
 ];
 
 beforeEach(async () => {

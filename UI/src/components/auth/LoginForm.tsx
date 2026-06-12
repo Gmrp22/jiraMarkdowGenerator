@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import { login } from '@/services/auth.service';
 import { loginSchema } from '@/lib/schemas';
+import { formatError } from '@/lib/formatError';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import type { LoginFormProps } from '@/types';
@@ -42,7 +43,7 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
       onSuccess?.();
       router.push('/tickets');
     } catch (err) {
-      setServerError(err instanceof Error ? err.message : 'Error al iniciar sesión');
+      setServerError(formatError(err));
     } finally {
       setLoading(false);
     }

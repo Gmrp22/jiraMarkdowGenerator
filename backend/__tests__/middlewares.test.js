@@ -44,7 +44,9 @@ describe('authMiddleware', () => {
   });
 
   it('calls next with 401 when token verification throws', () => {
-    jwt.verify.mockImplementation(() => { throw new Error('expired'); });
+    jwt.verify.mockImplementation(() => {
+      throw new Error('expired');
+    });
     const req = { cookies: { auth_token: 'bad-token' } };
     const next = makeNext();
     authMiddleware(req, makeRes(), next);

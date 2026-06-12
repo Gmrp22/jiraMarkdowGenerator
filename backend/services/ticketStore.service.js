@@ -3,6 +3,8 @@ const logger = require('../config/logger');
 const AppError = require('../utils/AppError');
 
 const store = new Map();
+const TTL_MS = 5 * 60 * 1000; // 5 minutos
+let lastLoadedAt = null;
 
 const refresh = async () => {
   const tickets = await jiraService.fetchAllTickets();
@@ -12,11 +14,13 @@ const refresh = async () => {
     store.set(ticket.key, ticket);
   });
 
+  lastLoadedAt = Date.now();
   logger.info({ count: store.size }, 'Ticket store refreshed');
 };
 
 const ensureLoaded = async () => {
-  if (store.size === 0) await refresh();
+  const expired = !lastLoadedAt || Date.now() - lastLoadedAt > TTL_MS;
+  if (store.size === 0 || expired) await refresh();
 };
 
 const getAll = async () => {

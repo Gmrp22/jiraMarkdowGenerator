@@ -71,3 +71,20 @@ export interface ModalProps {
 export interface LoginFormProps {
   onSuccess?: () => void;
 }
+
+export interface TicketCardProps {
+  ticket: Ticket;
+}
+
+export interface TicketListProps {
+  query?: string;
+}
+
+export interface SearchBarProps {
+  onSearch: (query: string) => void;
+}
+
+export interface SelectedPanelProps {
+  onGenerate: (ticketIds: string[]) => void;
+  loading?: boolean;
+}
