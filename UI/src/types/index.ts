@@ -38,3 +38,32 @@ export interface TicketStoreState {
   removeTicket: (key: string) => void;
   clearSelection: () => void;
 }
+
+export type ButtonVariant = 'primary' | 'secondary' | 'danger';
+
+export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: ButtonVariant;
+  loading?: boolean;
+}
+
+export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  label?: string;
+  error?: string;
+}
+
+export interface BadgeProps {
+  label: string;
+}
+
+export type SpinnerSize = 'sm' | 'md' | 'lg';
+
+export interface SpinnerProps {
+  size?: SpinnerSize;
+}
+
+export interface ModalProps {
+  open: boolean;
+  onClose: () => void;
+  title: string;
+  children: React.ReactNode;
+}

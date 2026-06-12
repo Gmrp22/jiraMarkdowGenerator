@@ -142,13 +142,13 @@ export const useGenerateContext = () =>
   - `searchSchema` → `{ query: string }`
   - Exporta también los tipos inferidos: `LoginFormData`, `RegisterFormData`, `SearchFormData`
 
-## Paso 8 — Componentes UI base
+## Paso 8 — Componentes UI base ✅
 
-- [ ] Crear `UI/src/components/ui/Button.tsx` — variantes: primary, secondary, danger; estados: loading, disabled
-- [ ] Crear `UI/src/components/ui/Input.tsx` — con label, error message, soporte de Zod errors
-- [ ] Crear `UI/src/components/ui/Badge.tsx` — para mostrar status del ticket (color según estado)
-- [ ] Crear `UI/src/components/ui/Spinner.tsx` — indicador de carga
-- [ ] Crear `UI/src/components/ui/Modal.tsx` — usando Headless UI `Dialog`
+- [x] `UI/src/components/ui/Button.tsx` — variantes: primary, secondary, danger; estados: loading, disabled
+- [x] `UI/src/components/ui/Input.tsx` — con label, error message, soporte de Zod errors
+- [x] `UI/src/components/ui/Badge.tsx` — colores según status del ticket (To Do, In Progress, Done, Blocked)
+- [x] `UI/src/components/ui/Spinner.tsx` — tamaños sm, md, lg
+- [x] `UI/src/components/ui/Modal.tsx` — usando Headless UI `Dialog`
 
 ## Paso 9 — Autenticación
 
