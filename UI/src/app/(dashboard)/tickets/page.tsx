@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { SearchBar } from '@/components/tickets/SearchBar';
 import { TicketList } from '@/components/tickets/TicketList';
@@ -15,31 +15,37 @@ import { Button } from '@/components/ui/Button';
 export default function TicketsPage() {
   const router = useRouter();
   const { user, logout } = useAuth();
+
+  const selectedTickets = useTicketStore((state) => state.selectedTickets);
   const clearSelection = useTicketStore((state) => state.clearSelection);
 
   const [query, setQuery] = useState('');
+  const [markdown, setMarkdown] = useState<string | undefined>();
   const [errorModal, setErrorModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
   const { mutate: generate, isPending } = useGenerateContext();
 
-  const handleGenerate = (ticketIds: string[]) => {
-    generate(ticketIds, {
-      onSuccess: (markdown) => {
-        const blob = new Blob([markdown], { type: 'text/markdown' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'context.md';
-        a.click();
-        URL.revokeObjectURL(url);
-        clearSelection();
-      },
-      onError: (err) => {
+  // genera automáticamente cada vez que cambia la selección
+  // generate (mutate) es estable entre renders — React Query lo garantiza
+  useEffect(() => {
+    if (selectedTickets.length === 0) return;
+    generate(selectedTickets.map((t) => t.key), {
+      onSuccess: (result: string) => setMarkdown(result),
+      onError: (err: unknown) => {
         setErrorMessage(formatError(err));
         setErrorModal(true);
       },
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedTickets]);
+
+  // markdown visible solo si hay tickets seleccionados
+  const displayMarkdown = selectedTickets.length > 0 ? markdown : undefined;
+
+  const handleClear = () => {
+    clearSelection();
+    setMarkdown(undefined);
   };
 
   const handleLogout = async () => {
@@ -67,8 +73,10 @@ export default function TicketsPage() {
           </div>
 
           <aside className="bg-card border-border rounded-lg border p-4">
-            <h2 className="text-foreground mb-4 text-sm font-semibold">Seleccionados</h2>
-            <SelectedPanel onGenerate={handleGenerate} loading={isPending} />
+            <h2 className="text-foreground mb-4 text-sm font-semibold">
+              {displayMarkdown ? 'context.md' : 'Seleccionados'}
+            </h2>
+            <SelectedPanel markdown={displayMarkdown} loading={isPending} onClear={handleClear} />
           </aside>
         </div>
       </main>

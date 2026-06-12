@@ -8,12 +8,31 @@ const getAuthHeader = () => {
   return `Basic ${credentials}`;
 };
 
+const extractAdfText = (node) => {
+  if (!node) return '';
+  if (node.type === 'text') return node.text ?? '';
+  if (node.type === 'hardBreak') return '\n';
+  if (!node.content?.length) return '';
+
+  const prefix = node.type === 'listItem' ? '- ' : node.type === 'orderedList' ? '' : '';
+
+  return node.content
+    .map((child, i) => {
+      const text = extractAdfText(child);
+      if (node.type === 'orderedList') return `${i + 1}. ${text}`;
+      return prefix + text;
+    })
+    .join(
+      node.type === 'doc' || node.type === 'bulletList' || node.type === 'orderedList' ? '\n' : ''
+    );
+};
+
 const normalizeIssue = (issue) => {
   const raw = {
     id: issue.id,
     key: issue.key,
     summary: issue.fields.summary ?? '',
-    description: issue.fields.description?.content?.[0]?.content?.[0]?.text ?? '',
+    description: issue.fields.description ? extractAdfText(issue.fields.description) : '',
     status: issue.fields.status?.name ?? '',
     type: issue.fields.issuetype?.name ?? '',
     assignee: issue.fields.assignee?.displayName ?? null,

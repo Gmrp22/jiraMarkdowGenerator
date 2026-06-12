@@ -85,6 +85,7 @@ export interface SearchBarProps {
 }
 
 export interface SelectedPanelProps {
-  onGenerate: (ticketIds: string[]) => void;
+  markdown?: string;
   loading?: boolean;
+  onClear: () => void;
 }
