@@ -84,6 +84,8 @@ export interface SearchBarProps {
   onSearch: (query: string) => void;
 }
 
+export type ViewMode = 'raw' | 'preview';
+
 export interface SelectedPanelProps {
   markdown?: string;
   loading?: boolean;

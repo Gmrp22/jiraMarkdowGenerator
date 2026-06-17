@@ -1,15 +1,17 @@
 'use client';
 
 import { useState } from 'react';
+import ReactMarkdown from 'react-markdown';
 import { useTicketStore } from '@/store/ticketStore';
 import { Button } from '@/components/ui/Button';
 import { Spinner } from '@/components/ui/Spinner';
-import type { SelectedPanelProps } from '@/types';
+import type { SelectedPanelProps, ViewMode } from '@/types';
 
 export function SelectedPanel({ markdown, loading = false, onClear }: SelectedPanelProps) {
   const selectedTickets = useTicketStore((state) => state.selectedTickets);
   const removeTicket = useTicketStore((state) => state.removeTicket);
   const [copied, setCopied] = useState(false);
+  const [viewMode, setViewMode] = useState<ViewMode>('raw');
 
   const handleCopy = async () => {
     if (!markdown) return;
@@ -49,9 +51,39 @@ export function SelectedPanel({ markdown, loading = false, onClear }: SelectedPa
 
       {markdown && !loading && (
         <>
-          <pre className="border-border bg-background text-foreground max-h-[50vh] overflow-auto rounded-md border p-3 text-xs leading-relaxed whitespace-pre-wrap">
-            {markdown}
-          </pre>
+          <div className="flex gap-1 self-end">
+            <button
+              onClick={() => setViewMode('raw')}
+              className={`rounded px-2 py-1 text-xs transition-colors ${
+                viewMode === 'raw'
+                  ? 'bg-primary text-primary-foreground'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              Raw
+            </button>
+            <button
+              onClick={() => setViewMode('preview')}
+              className={`rounded px-2 py-1 text-xs transition-colors ${
+                viewMode === 'preview'
+                  ? 'bg-primary text-primary-foreground'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              Preview
+            </button>
+          </div>
+
+          {viewMode === 'raw' ? (
+            <pre className="border-border bg-background text-foreground max-h-[50vh] overflow-auto rounded-md border p-3 text-xs leading-relaxed whitespace-pre-wrap">
+              {markdown}
+            </pre>
+          ) : (
+            <div className="prose prose-sm prose-invert border-border bg-background max-h-[50vh] overflow-auto rounded-md border p-3">
+              <ReactMarkdown>{markdown}</ReactMarkdown>
+            </div>
+          )}
+
           <Button onClick={handleCopy} variant="secondary" className="w-full">
             {copied ? '¡Copiado!' : 'Copiar markdown'}
           </Button>

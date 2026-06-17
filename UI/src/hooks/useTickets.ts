@@ -5,4 +5,6 @@ export const useTickets = (query?: string) =>
   useQuery({
     queryKey: ['tickets', query],
     queryFn: () => (query ? searchTickets(query) : getTickets()),
+    staleTime: 5 * 60 * 1000,
+
   });
