@@ -30,13 +30,16 @@ export default function TicketsPage() {
   // generate (mutate) es estable entre renders — React Query lo garantiza
   useEffect(() => {
     if (selectedTickets.length === 0) return;
-    generate(selectedTickets.map((t) => t.key), {
-      onSuccess: (result: string) => setMarkdown(result),
-      onError: (err: unknown) => {
-        setErrorMessage(formatError(err));
-        setErrorModal(true);
-      },
-    });
+    generate(
+      selectedTickets.map((t) => t.key),
+      {
+        onSuccess: (result: string) => setMarkdown(result),
+        onError: (err: unknown) => {
+          setErrorMessage(formatError(err));
+          setErrorModal(true);
+        },
+      }
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedTickets]);
 
